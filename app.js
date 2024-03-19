@@ -1,10 +1,11 @@
 var express = require('express');
 var app = express();
+var request = require('request');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
 
 const hosturl = "localhost:3000";
-const fournisseurUrl = "http://10.1.7.45:3000/products/"
+const fournisseurUrl = "http://25.14.207.84:3000/api/receive-products/"
 
 // Import the functions you need from the SDKs you need
 const firebaseapp = require("firebase/app");
@@ -78,7 +79,7 @@ app.get('/product/update', async function (req, res) {
     const result = await updateProducts(productsArray);
 
     res.send(
-      result
+      "Products under quantity: " + reapThreshhold + " automatically create an order request <br>" + JSON.stringify(result)
     );
 
     // res.send(
@@ -158,9 +159,19 @@ async function updateProducts(productsArray) {
   });
 
   if (toReapProducts.length > 0) {
-    const response = await fetch(fournisseurUrl + "?products="+JSON.stringify(toReapProducts))
+    //const response = await fetch(fournisseurUrl + "?products="+JSON.stringify(toReapProducts))
     console.log("IL FAUT REAP");
     console.log(toReapProducts);
+
+    request.post(
+      fournisseurUrl,
+      { json: toReapProducts },
+      function (error, response, body) {
+          if (!error && response.statusCode == 200) {
+              console.log(body);
+          }
+      }
+    );
   }
 
   return returnProducts;
