@@ -28,24 +28,12 @@ const firebaseConfig = {
 const appFirebase = firebaseapp.initializeApp(firebaseConfig);
 const db = firestore.getFirestore(appFirebase);
 
-var myData = {
-    "name": "Mouns",
-    "surname": "LeBouns"
-};
-
 var reapThreshhold = 4;
 
 app.get('/', async function (req, res) {
-  // res.send('Hello World!');
-
   const productsDb = collection(db, 'products');
   const productsDocs = await getDocs(productsDb);
   const productsList = productsDocs.docs.map(doc => doc.data());
-
-  // await firestore.setDoc(firestore
-  //   .doc(db, "products", "Poulpe"),
-  //     {"name": "Poulpe", "quantity": 13}
-  //   );
   
   res.send(productsList)
 });
@@ -58,14 +46,7 @@ app.get('/product', async function (req, res) {
   res.send(productsList)
 });
 
-app.get('/data', function (req, res) {
-    res.send(
-        myData
-    );
-  });
-
 app.get('/product/update', async function (req, res) {
-    // console.log(req.query);
     const query = req.query;
     const products = query["products"];
 
@@ -81,10 +62,6 @@ app.get('/product/update', async function (req, res) {
     res.send(
       "Products under quantity: " + reapThreshhold + " automatically create an order request <br>" + JSON.stringify(result)
     );
-
-    // res.send(
-    //     myData
-    // );
   });
 
 app.get('/product/search', async function (req, res) {
@@ -159,10 +136,6 @@ async function updateProducts(productsArray) {
   });
 
   if (toReapProducts.length > 0) {
-    //const response = await fetch(fournisseurUrl + "?products="+JSON.stringify(toReapProducts))
-    console.log("IL FAUT REAP");
-    console.log(toReapProducts);
-
     request.post(
       fournisseurUrl,
       { json: toReapProducts },
@@ -196,9 +169,7 @@ async function addProductsToDb(productsArray) {
 
       firestore.setDoc(firestore.doc(db, "products", product["name"]),
         product
-      )/* .then((data) => {
-        returnProducts.push(data);
-      }) */;
+      );
     }
   })
 
